@@ -2,28 +2,8 @@ import re
 import requests
 from urllib.parse import urlparse
 
-# Ввод начальной страницы
-URL = input("format: protocol://domains\n")
 
-# Данные действия необходимы для нахождения страниц,
-# относящихся к тому же домену второго уровня
-info = urlparse(URL)
-try:
-    domain = info.netloc
-    nameList = domain.split(".")
-    domain = "%s.%s" %(nameList[-2], nameList[-1])
-except:
-    print("Bad addr")
-    exit()
-
-visitedPages = set()
-mails = set()
-
-if URL[-1] == '/':
-    URL = URL[:-1]
-
-
-def search_emails(url, deep):
+def search_emails(url, power):
     visitedPages.add(url)
 
     # Проверка на доступность url
@@ -70,12 +50,35 @@ def search_emails(url, deep):
         if visitedPages.__contains__(page):
             continue
 
-        if deep <= 0:
+        if power <= 0:
             continue
 
-        search_emails(page, deep - 1)
+        search_emails(page, power - 1)
 
 
-search_emails(URL, 5)
+# Ввод начальной страницы
+URL = input("format: protocol://domains\n")
+# Задание глубины обхода
+power = int(input("power\n"))
+
+# Данные действия необходимы для нахождения страниц,
+# относящихся к тому же домену второго уровня
+info = urlparse(URL)
+try:
+    domain = info.netloc
+    nameList = domain.split(".")
+    domain = "%s.%s" %(nameList[-2], nameList[-1])
+except:
+    print("Bad addr")
+    exit()
+
+visitedPages = set()
+mails = set()
+
+if URL[-1] == '/':
+    URL = URL[:-1]
+
+
+search_emails(URL, power)
 print(mails.__len__())
 print(mails)
